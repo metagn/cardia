@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "metagn"
-description   = ""
+description   = "a"
 license       = "MIT"
 srcDir        = "src"
 
@@ -10,6 +10,9 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 2.0.2"
+
+when (compiles do: import nimbleutils):
+  import nimbleutils
 
 task docs, "build docs for all modules":
   when declared(buildDocs):

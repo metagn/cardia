@@ -1,3 +1,6 @@
+# todo: division
+# evaluation, differentiation, integration are really simple anyway
+
 type
   Polynomial*[T] = object
     coefficients*: seq[T]
