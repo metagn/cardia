@@ -6,3 +6,4 @@ todo modules:
 - formal logic & formal language representation
 - maybe graph stuff
 - free groups & presentations?
+- definitely permutation groups
