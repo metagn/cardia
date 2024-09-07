@@ -1,25 +1,51 @@
-# todo: division
+# todo: division, modulo, GCD
 # evaluation, differentiation, integration are really simple anyway
+# use variable name/ID
+
+import ./interfaces
 
 type
   Polynomial*[T] = object
     coefficients*: seq[T]
 
-proc `$`*[T](a: Polynomial[T]): string =
+const nameOrder = "xyz"
+
+proc toString*[T](a: Polynomial[T], name: string): string =
   let len = a.coefficients.len
   if len == 0:
-    return $T(0)
-  result = $a.coefficients[0]
+    return $zero(T)
+  when T is Polynomial:
+    let newName =
+      if name.len == 1 and (let ind = nameOrder[0..^2].find(name[0]); ind >= 0):
+        $nameOrder[ind + 1]
+      else:
+        name & '\''
+    template coeffString(ex): untyped =
+      toString(ex, newName)
+  else:
+    template coeffString(ex): untyped = $ex
+  result = coeffString(a.coefficients[0])
   for i in 1 ..< len:
     let ai = a.coefficients[i]
-    if ai == 0: continue
+    if ai.isZero: continue
     result.add(" + ")
-    result.add($ai)
+    if not ai.isOne:
+      let coeff = coeffString(ai)
+      if ' ' in coeff:
+        result.add('(')
+        result.add(coeff)
+        result.add(')')
+      else:
+        result.add(coeff)
     if i == 1:
-      result.add("x")
+      result.add(name)
     else:
-      result.add("x^")
+      result.add(name)
+      result.add("^")
       result.add($i)
+
+proc `$`*[T](a: Polynomial[T]): string =
+  toString(a, "x")
 
 proc polynomial*[T](x: varargs[T]): Polynomial[T] {.inline.} =
   Polynomial[T](coefficients: @x)
@@ -27,12 +53,18 @@ proc polynomial*[T](x: varargs[T]): Polynomial[T] {.inline.} =
 proc zero*[T](): Polynomial[T] {.inline.} =
   Polynomial[T](coefficients: @[])
 
+template value*[T](x: Zero[Polynomial[T]]): Polynomial[T] =
+  zero[T]()
+
 proc one*[T](): Polynomial[T] {.inline.} =
-  polynomial[T](1)
+  polynomial(one(T))
+
+template value*[T](x: One[Polynomial[T]]): Polynomial[T] =
+  one[T]()
 
 proc X*[T](factor = 1): Polynomial[T] {.inline.} =
   result = Polynomial[T](coefficients: newSeq[T](factor + 1))
-  result.coefficients[factor] = 1
+  result.coefficients[factor] = one(T)
 
 proc polynomialTimesXN*[T](factor: int, x: varargs[T]): Polynomial[T] {.inline.} =
   result = Polynomial[T](coefficients: newSeq[T](x.len + factor))
@@ -46,7 +78,7 @@ proc updateDegree*[T](a: var Polynomial[T]) =
   let origLast = high(a.coefficients)
   var last = origLast
   while last >= 0:
-    if a.coefficients[last] != 0:
+    if a.coefficients[last].isNonZero:
       if last != origLast:
         # branching better than pointless function call
         a.coefficients.setLen(last + 1)
@@ -98,7 +130,7 @@ proc `-`*[T](a, b: Polynomial[T]): Polynomial[T] =
     result -= a
 
 proc `*=`*[T](a: var Polynomial[T], scalar: T) =
-  if scalar == 1: return
+  if scalar.isOne: return
   for i in 0 ..< a.coefficients.len:
     a.coefficients[i] *= scalar
 
@@ -136,15 +168,15 @@ proc mulKaratsubaSingle*[T](a, b: openarray[T]): Polynomial[T] =
   var Dst = newSeq[T](stLen)
   for i in 0 ..< stLen:
     let actualI = i + 1
-    var val = default(T)
+    var val = zero(T)
     for t in (actualI div 2 + 1) .. min(actualI, maxN - 1):
       let s = actualI - t
-      var bPart = default(T)
+      var bPart = zero(T)
       safeAdd(bPart, b, s)
       safeAdd(bPart, b, t)
-      if bPart != 0:
+      if bPart.isNonZero:
         # b more likely to be smaller, check bPart first
-        var aPart = default(T)
+        var aPart = zero(T)
         safeAdd(aPart, a, s)
         safeAdd(aPart, a, t)
         val += aPart * bPart
@@ -198,3 +230,6 @@ proc mulKaratsubaRec*[T](a, b: openarray[T]): Polynomial[T] =
 
 proc `*`*[T](a, b: Polynomial[T]): Polynomial[T] =
   mulKaratsubaRec(a.coefficients, b.coefficients)
+
+proc `*=`*[T](a: var Polynomial[T], b: Polynomial[T]) =
+  a = a * b

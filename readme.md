@@ -6,7 +6,6 @@ todo modules:
 - formal logic & formal language representation
 - maybe graph stuff
 - free groups & presentations?
-- definitely permutation groups
 - primes probably
   - off-memory cache? primes up to 8 billion are 1 GB
 - quadratic integers, pythagorean triples etc
