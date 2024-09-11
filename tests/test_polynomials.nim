@@ -19,6 +19,34 @@ block:
   doAssert xp5 == xp3 * xp2
   doAssert xp5 == xp3 *! xp2
 
+block: # float
+  proc `*!`[T](a, b: Polynomial[T]): Polynomial[T] =
+    mulKaratsubaSingle(a.coefficients, b.coefficients)
+  let xp1 = polynomial(1.0, 1.0)
+  let xp2 = xp1 * xp1
+  doAssert xp2 == polynomial(1.0, 2.0, 1.0)
+  let xp3 = xp2 * xp1
+  doAssert xp3 == polynomial(1.0, 3.0, 3.0, 1.0)
+  doAssert xp3 == xp2 *! xp1
+  let xp4 = xp3 * xp1
+  doAssert xp4 == polynomial(1.0, 4.0, 6.0, 4.0, 1.0)
+  doAssert xp4 == xp3 *! xp1
+  doAssert xp4 == xp2 * xp2
+  let xp5 = xp4 * xp1
+  doAssert xp5 == polynomial(1.0, 5.0, 10.0, 10.0, 5.0, 1.0)
+  doAssert xp5 == xp4 *! xp1
+  doAssert xp5 == xp3 * xp2
+  doAssert xp5 == xp3 *! xp2
+
+  let a = polynomial(1.5, 2.5, 1.5)
+  doAssert $a == "1.5 + 2.5x + 1.5x^2"
+  let b = a * a
+  doAssert $b == "2.25 + 7.5x + 10.75x^2 + 7.5x^3 + 2.25x^4"
+  let c = a * xp1
+  doAssert $c == "1.5 + 4.0x + 4.0x^2 + 1.5x^3"
+  let a2 = a * 2
+  doAssert $a2 == "3.0 + 5.0x + 3.0x^2"
+
 block: # nested
   let x = polynomial(1, 1, 1)
   let y = polynomial(x, 2 * x, x)
