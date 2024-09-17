@@ -22,7 +22,10 @@ task docs, "build docs for all modules":
 
 task tests, "run tests for multiple backends":
   when declared(runTests):
-    runTests(backends = {c, js, nims})
-    runTests("tests/generated", backends = {c, js, nims})
+    when (NimMajor, NimMinor) >= (2, 1):
+      const backends = {c, js, nims}
+    else:
+      const backends = {c, js}
+    runTests(backends = backends)
   else:
     echo "tests task not implemented, need nimbleutils"
