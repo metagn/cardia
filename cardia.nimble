@@ -16,7 +16,7 @@ when (compiles do: import nimbleutils):
 
 task docs, "build docs for all modules":
   when declared(buildDocs):
-    buildDocs(gitUrl = "https://github.com/metagn/myskibidiacademia")
+    buildDocs(gitUrl = "https://github.com/metagn/cardia")
   else:
     echo "docs task not implemented, need nimbleutils"
 

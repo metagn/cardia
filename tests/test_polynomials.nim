@@ -1,4 +1,4 @@
-import myskibidiacademia/[interfaces, polynomials]
+import cardia/[interfaces, polynomials]
 
 block:
   proc `*!`[T](a, b: Polynomial[T]): Polynomial[T] =

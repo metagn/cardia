@@ -1,4 +1,4 @@
-import myskibidiacademia/permutations
+import cardia/permutations
 
 block: # just S2
   let default = toBijection([0, 1])

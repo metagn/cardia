@@ -1,4 +1,4 @@
-import myskibidiacademia/[congruence, interfaces]
+import cardia/[congruence, interfaces]
 
 # todo test exponentiation
 

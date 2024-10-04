@@ -1,4 +1,4 @@
-import myskibidiacademia/[congruence, interfaces]
+import cardia/[congruence, interfaces]
 
 # see test_Zn for most basic tests
 
