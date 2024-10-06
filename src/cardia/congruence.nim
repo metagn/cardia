@@ -30,8 +30,11 @@ template `+`*[T; N: static T](a, b: Mod[T, N]): Mod[T, N] =
   x += b
   x
 
-template `-`*[T; N: static T](a: Mod[T, N]): Mod[T, N] =
-  Mod[T, N](N - T(a))
+proc `-`*[T; N: static T](a: Mod[T, N]): Mod[T, N] {.inline.} =
+  if T(a).isZero:
+    result = a
+  else:
+    result = Mod[T, N](N - T(a))
 
 proc `-=`*[T; N: static T](a: var Mod[T, N], b: Mod[T, N]) {.inline.} =
   # fully inlined a + (-b), hopefully faster than mod

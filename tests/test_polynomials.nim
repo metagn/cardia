@@ -1,8 +1,9 @@
 import cardia/[interfaces, polynomials]
 
+proc `*!`[T](a, b: Polynomial[T]): Polynomial[T] =
+  mulKaratsubaSingle(a.coefficients, b.coefficients)
+
 block:
-  proc `*!`[T](a, b: Polynomial[T]): Polynomial[T] =
-    mulKaratsubaSingle(a.coefficients, b.coefficients)
   let xp1 = polynomial(1, 1)
   let xp2 = xp1 * xp1
   doAssert xp2 == polynomial(1, 2, 1)
@@ -20,8 +21,6 @@ block:
   doAssert xp5 == xp3 *! xp2
 
 block: # float
-  proc `*!`[T](a, b: Polynomial[T]): Polynomial[T] =
-    mulKaratsubaSingle(a.coefficients, b.coefficients)
   let xp1 = polynomial(1.0, 1.0)
   let xp2 = xp1 * xp1
   doAssert xp2 == polynomial(1.0, 2.0, 1.0)
@@ -85,3 +84,36 @@ block: # generic
   doAssert $y == "1 + z + z^2 + (2 + 2z + 2z^2)x + (1 + z + z^2)x^2"
   let z = y * ZPolynomial[int](polynomial(3))
   doAssert $z == "3 + 3z + 3z^2 + (6 + 6z + 6z^2)x + (3 + 3z + 3z^2)x^2"
+
+import cardia/congruence
+
+block: # polynomial in Z2
+  type Z2 = Mod[int, 2]
+  let x = polynomial(Z2 1, Z2 1, Z2 1)
+  let y = polynomial(Z2 1, Z2 0, Z2 1)
+  doAssert $x == "1 + x + x^2"
+  doAssert $y == "1 + x^2"
+  doAssert x == -x
+  doAssert y == -y
+  let add = x + y
+  let sub = x - y
+  doAssert $add == "0 + x"
+  doAssert add == sub
+  let mul = x * y
+  doAssert $mul == "1 + x + x^3 + x^4"
+  let x2 = x * x
+  doAssert $x2 == "1 + x^2 + x^4"
+  let y2 = y * y
+  doAssert $y2 == "1 + x^4"
+  when false:
+    # both of these are broken (recursive karatsuba)
+    # gives 1 + x^2 + x^6 + x^7:
+    doAssert $(x2 * y2) == "1 + x^2 + x^6 + x^8"
+    # gives 1 + x^2 + x^5 + x^y:
+    let mul2 = mul * mul
+    doAssert $mul2 == "1 + x^2 + x^6 + x^8"
+    doAssert x2 * y2 == mul2
+  doAssert $(x2 *! y2) == "1 + x^2 + x^6 + x^8"
+  let mul2 = mul *! mul
+  doAssert $mul2 == "1 + x^2 + x^6 + x^8"
+  doAssert x2 *! y2 == mul2
