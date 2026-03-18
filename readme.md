@@ -10,5 +10,6 @@ todo modules:
   - off-memory cache? primes up to 8 billion are 1 GB
 - quadratic integers, pythagorean triples etc
 - maybe linear systems of modular equations
+- combinatorics
 
 in general don't want too many approximations
